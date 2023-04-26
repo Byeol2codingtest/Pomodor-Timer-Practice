@@ -17,9 +17,27 @@ class _HomeScreenState extends State<HomeScreen> {
   int totalGoal = 0;
   int selectedMins = 0;
 
-  List<int> selectMins = [5, 10, 15, 20, 25, 30, 35, 40, 45];
+  List<Widget> selectMins = [
+    const Text('10'),
+    const Text('15'),
+    const Text('20'),
+    const Text('25'),
+    const Text('30'),
+    const Text('35'),
+    const Text('40'),
+  ];
+
+  // List<int> selectMins = [
+  //   10,
+  //   15,
+  //   20,
+  //   25,
+  //   30,
+  //   35,
+  //   40,
+  // ];
+
   final List<bool> _selectedMins = <bool>[
-    false,
     false,
     false,
     false,
@@ -27,7 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
     false,
     false,
     false,
-    false
   ];
   bool vertical = false;
 
@@ -72,10 +89,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return duration.toString().split(".").first;
   }
 
-  void onSelectMinsPressed() {
+  void selectedMinsreturn(String value) {
     setState(() {
-      selectedMins = selectMins[0];
-      print(selectedMins);
+      totalSeconds = int.parse(value) * 60;
+      timer.cancel();
+      isRunning = false;
     });
   }
 
@@ -106,33 +124,39 @@ class _HomeScreenState extends State<HomeScreen> {
                   Theme.of(context).scaffoldBackgroundColor,
                   Theme.of(context).cardColor,
                   Theme.of(context).cardColor,
+                  Theme.of(context).cardColor,
                   Theme.of(context).scaffoldBackgroundColor,
                 ]).createShader(rect);
               },
-              child: ListView.builder(
+              child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                itemCount: selectMins.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: onSelectMinsPressed,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: 60,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Text(
-                          "${selectMins[index]}",
-                          style: TextStyle(
-                              fontSize: 35, color: Theme.of(context).cardColor),
-                        ),
-                      ),
-                    ),
-                  );
-                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: ToggleButtons(
+                    onPressed: (index) {
+                      setState(() {
+                        // The button that is tapped is set to true, and the others to false.
+                        for (int i = 0; i < _selectedMins.length; i++) {
+                          _selectedMins[i] = i == index;
+                        }
+                      });
+                      return selectedMinsreturn(selectMins[index]
+                          .toString()
+                          .split("(")
+                          .last
+                          .substring(1, 3));
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    selectedBorderColor: Colors.grey,
+                    selectedColor: Theme.of(context).scaffoldBackgroundColor,
+                    fillColor: Colors.white,
+                    color: Theme.of(context).cardColor,
+                    isSelected: _selectedMins,
+                    constraints:
+                        const BoxConstraints(minHeight: 50, minWidth: 50),
+                    children: selectMins,
+                  ),
+                ),
               ),
             ),
           ),
@@ -154,7 +178,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Flexible(
             flex: 2,
             child: Container(
-              color: Theme.of(context).cardColor,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Theme.of(context).cardColor,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
